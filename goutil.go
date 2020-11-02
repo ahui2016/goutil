@@ -3,7 +3,10 @@ package goutil
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
+	"log"
 	"math/big"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -76,4 +79,40 @@ func FilesInDir(dir, ext string) ([]string, error) {
 		return nil, err
 	}
 	return filePaths, nil
+}
+
+func CheckErr(w http.ResponseWriter, err error, code int) bool {
+	if err != nil {
+		log.Println(err)
+		JsonMessage(w, err.Error(), code)
+		return true
+	}
+	return false
+}
+
+func JsonMsgOK(w http.ResponseWriter) {
+	JsonMessage(w, "OK", 200)
+}
+
+func JsonMsg404(w http.ResponseWriter) {
+	JsonMessage(w, "Not Found", 404)
+}
+
+func JsonRequireLogin(w http.ResponseWriter) {
+	JsonMessage(w, "Require Login", http.StatusUnauthorized)
+}
+
+// JsonMessage 主要用于向前端返回出错消息。
+func JsonMessage(w http.ResponseWriter, message string, code int) {
+	msg := map[string]string{"message": message}
+	JsonResponse(w, msg, code)
+}
+
+// JsonResponse 要用于向前端返回有用数据。
+// 参考 https://stackoverflow.com/questions/59763852/can-you-return-json-in-golang-http-error
+func JsonResponse(w http.ResponseWriter, obj interface{}, code int) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(obj)
 }
