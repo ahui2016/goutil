@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/big"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -181,11 +182,17 @@ func CreateReturnFile(filePath string, src io.Reader) (int64, *os.File, error) {
 	return size, f, nil
 }
 
-// BytesToThumb .
+// BytesToThumb creates a thumbnail from img, uses default size and default quality,
+// and write the thumbnail to thumbPath.
 func BytesToThumb(img []byte, thumbPath string) error {
 	buf, err := graphics.Thumbnail(img, 0, 0)
 	if err != nil {
 		return err
 	}
 	return CreateFile(thumbPath, buf)
+}
+
+// TypeByFilename 从文件名中截取后缀名，然后判断文件类型。
+func TypeByFilename(filename string) string {
+	return mime.TypeByExtension(filepath.Ext(filename))
 }
