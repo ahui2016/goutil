@@ -2,8 +2,13 @@ package goutil
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
+	"io"
+	"io/ioutil"
 	"log"
 	"math/big"
 	"net/http"
@@ -11,6 +16,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/ahui2016/goutil/graphics"
 )
 
 const (
@@ -23,7 +30,10 @@ func TimeNow() string {
 	return time.Now().Format(ISO8601)
 }
 
-// NewID .
+// NewID 返回一个上升趋势的随机 id, 由时间戳与随机数组成。
+// 时间戳确保其上升趋势（大致有序），随机数确保其随机性（防止被穷举）。
+// NewID 考虑了 “生成新 id 的速度”、 “并发生成时防止冲突” 与 “id 长度”
+// 这三者的平衡，适用于大多数中、小规模系统（当然，不适用于大型系统）。
 func NewID() string {
 	var max int64 = 100_000_000
 	n, err := rand.Int(rand.Reader, big.NewInt(max))
@@ -72,8 +82,8 @@ func Base64Decode(s string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(s)
 }
 
-// FilesInDir .
-func FilesInDir(dir, ext string) ([]string, error) {
+// GetFilesByExt .
+func GetFilesByExt(dir, ext string) ([]string, error) {
 	pattern := filepath.Join(dir, "*"+ext)
 	filePaths, err := filepath.Glob(pattern)
 	if err != nil {
@@ -118,4 +128,64 @@ func JsonResponse(w http.ResponseWriter, obj interface{}, code int) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(obj)
+}
+
+// GetFileContents gets contents from http.Request.FormFile("file").
+// It also verifies the file has not been corrupted.
+func GetFileContents(r *http.Request) ([]byte, error) {
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// 将文件内容全部读入内存
+	contents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	// 根据文件内容生成 checksum 并检查其是否正确
+	if Sha256Hex(contents) != r.FormValue("checksum") {
+		return nil, errors.New("checksums do not match")
+	}
+	return contents, nil
+}
+
+// Sha256Hex .
+func Sha256Hex(data []byte) string {
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:])
+}
+
+// CreateFile 把 src 的数据写入 filePath, 权限是 0600, 自动关闭 file.
+func CreateFile(filePath string, src io.Reader) error {
+	_, file, err := CreateReturnFile(filePath, src)
+	if err == nil {
+		file.Close()
+	}
+	return err
+}
+
+// CreateReturnFile 把 src 的数据写入 filePath, 权限是 0600,
+// 会自动创建或覆盖文件，返回 file, 要记得关闭资源。
+func CreateReturnFile(filePath string, src io.Reader) (int64, *os.File, error) {
+	f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return 0, nil, err
+	}
+	size, err := io.Copy(f, src)
+	if err != nil {
+		return 0, nil, err
+	}
+	return size, f, nil
+}
+
+// BytesToThumb .
+func BytesToThumb(img []byte, thumbPath string) error {
+	buf, err := graphics.Thumbnail(img, 0, 0)
+	if err != nil {
+		return err
+	}
+	return CreateFile(thumbPath, buf)
 }

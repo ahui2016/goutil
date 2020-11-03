@@ -18,7 +18,7 @@ const (
 
 // ResizeLimit resizes the image if it's long side bigger than limit.
 // Use default limit(900) if limit is set to zero.
-// Use default quality(85) if size is set to zero.
+// Use default quality(85) if quality is set to zero.
 func ResizeLimit(img []byte, limit float64, quality int) (*bytes.Buffer, error) {
 	src, err := ReadImage(img)
 	if err != nil {
@@ -31,7 +31,7 @@ func ResizeLimit(img []byte, limit float64, quality int) (*bytes.Buffer, error) 
 
 // Thumbnail create a thumbnail of imgFile.
 // Use default size(128) if size is set to zero.
-// Use default quality(85) if size is set to zero.
+// Use default quality(85) if quality is set to zero.
 func Thumbnail(img []byte, size, quality int) (*bytes.Buffer, error) {
 	if size == 0 {
 		size = defaultSize
@@ -46,7 +46,7 @@ func Thumbnail(img []byte, size, quality int) (*bytes.Buffer, error) {
 	return jpegEncode(src, quality)
 }
 
-// Use default quality(85) if size is set to zero.
+// Use default quality(85) if quality is set to zero.
 func jpegEncode(src image.Image, quality int) (*bytes.Buffer, error) {
 	if quality == 0 {
 		quality = defaultQuality
@@ -56,7 +56,7 @@ func jpegEncode(src image.Image, quality int) (*bytes.Buffer, error) {
 	return buf, err
 }
 
-// ReadImage .
+// ReadImage converts bytes to image. Supports webp.
 func ReadImage(img []byte) (image.Image, error) {
 	r := bytes.NewReader(img)
 	src, err := imaging.Decode(r, imaging.AutoOrientation(true))
