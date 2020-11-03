@@ -52,10 +52,11 @@ func PathIsExist(name string) bool {
 	return !PathIsNotExist(name)
 }
 
-// MustMkdir .
-func MustMkdir(name string) {
-	if PathIsNotExist(name) {
-		if err := os.Mkdir(name, 0600); err != nil {
+// MustMkdir 确保有一个名为 dirName 的文件夹，
+// 如果没有则自动创建，如果已存在则不进行任何操作。
+func MustMkdir(dirName string) {
+	if PathIsNotExist(dirName) {
+		if err := os.Mkdir(dirName, 0600); err != nil {
 			panic(err)
 		}
 	}
@@ -81,6 +82,8 @@ func FilesInDir(dir, ext string) ([]string, error) {
 	return filePaths, nil
 }
 
+// CheckErr 检查 err, 如果有错就以 json 形式返回给前端，并返回 true.
+// 如果没有错误则返回 false.
 func CheckErr(w http.ResponseWriter, err error, code int) bool {
 	if err != nil {
 		log.Println(err)
