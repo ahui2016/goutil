@@ -94,13 +94,13 @@ func GetFilesByExt(dir, ext string) ([]string, error) {
 }
 
 // GetID checks if the r.FormValue("id") is empty or not,
-// if it is empty, return false; if it is not empty,
-// return the id and true.
-func GetID(w http.ResponseWriter, r *http.Request) (string, bool) {
-	id := r.FormValue("id")
+// if it is empty, write error message and return false;
+// if it is not empty, return the id and true.
+func GetID(w http.ResponseWriter, r *http.Request) (id string, ok bool) {
+	id = r.FormValue("id")
 	if id == "" {
 		JsonMessage(w, "id is empty", 400)
-		return "", false
+		return
 	}
 	return id, true
 }
@@ -192,6 +192,16 @@ func CreateReturnFile(filePath string, src io.Reader) (int64, *os.File, error) {
 		return 0, nil, err
 	}
 	return size, f, nil
+}
+
+// DeleteFiles .
+func DeleteFiles(files ...string) error {
+	for _, f := range files {
+		if err := os.Remove(f); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // BytesToThumb creates a thumbnail from img, uses default size and default quality,
