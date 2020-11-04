@@ -93,6 +93,18 @@ func GetFilesByExt(dir, ext string) ([]string, error) {
 	return filePaths, nil
 }
 
+// GetID checks if the r.FormValue("id") is empty or not,
+// if it is empty, return false; if it is not empty,
+// return the id and true.
+func GetID(w http.ResponseWriter, r *http.Request) (string, bool) {
+	id := r.FormValue("id")
+	if id == "" {
+		JsonMessage(w, "id is empty", 400)
+		return "", false
+	}
+	return id, true
+}
+
 // CheckErr 检查 err, 如果有错就以 json 形式返回给前端，并返回 true.
 // 如果没有错误则返回 false.
 func CheckErr(w http.ResponseWriter, err error, code int) bool {
