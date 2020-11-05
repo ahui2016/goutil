@@ -31,6 +31,12 @@ func TimeNow() string {
 	return time.Now().Format(ISO8601)
 }
 
+// TimestampFilename .
+func TimestampFilename(ext string) string {
+	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	return name + ext
+}
+
 // NewID 返回一个上升趋势的随机 id, 由时间戳与随机数组成。
 // 时间戳确保其上升趋势（大致有序），随机数确保其随机性（防止被穷举）。
 // NewID 考虑了 “生成新 id 的速度”、 “并发生成时防止冲突” 与 “id 长度”
