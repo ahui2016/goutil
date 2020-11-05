@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ahui2016/goutil/graphics"
@@ -200,11 +201,13 @@ func CreateReturnFile(filePath string, src io.Reader) (int64, *os.File, error) {
 	return size, f, nil
 }
 
-// DeleteFiles .
+// DeleteFiles 删除全部 files, 忽略找不到文件的错误，返回其他错误。
 func DeleteFiles(files ...string) error {
 	for _, f := range files {
 		if err := os.Remove(f); err != nil {
-			return err
+			if !strings.Contains(err.Error(), "cannot find") {
+				return err
+			}
 		}
 	}
 	return nil
