@@ -74,10 +74,19 @@ func PathIsExist(name string) bool {
 // 如果没有则自动创建，如果已存在则不进行任何操作。
 func MustMkdir(dirName string) {
 	if PathIsNotExist(dirName) {
-		if err := os.Mkdir(dirName, 0600); err != nil {
+		if err := os.Mkdir(dirName, 0700); err != nil {
 			panic(err)
 		}
 	}
+}
+
+// UserHomeDir .
+func UserHomeDir() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	return homeDir
 }
 
 // Base64Encode .
