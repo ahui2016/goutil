@@ -219,7 +219,8 @@ func CreateReturnFile(filePath string, src io.Reader) (int64, *os.File, error) {
 func DeleteFiles(files ...string) error {
 	for _, f := range files {
 		if err := os.Remove(f); err != nil {
-			if !strings.Contains(err.Error(), "cannot find") {
+			if !strings.Contains(err.Error(), "cannot find") ||
+				!strings.Contains(err.Error(), "no such file") {
 				return err
 			}
 		}
