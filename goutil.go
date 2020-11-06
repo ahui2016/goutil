@@ -121,6 +121,11 @@ func GetFormValue(w http.ResponseWriter, r *http.Request, key string) (value str
 	return value, true
 }
 
+// GetID .
+func GetID(w http.ResponseWriter, r *http.Request) (string, bool) {
+	return GetFormValue(w, r, "id")
+}
+
 // CheckErr 检查 err, 如果有错就以 json 形式返回给前端，并返回 true.
 // 如果没有错误则返回 false.
 func CheckErr(w http.ResponseWriter, err error, code int) bool {
