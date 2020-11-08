@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -27,7 +28,7 @@ const (
 	ISO8601 = "2006-01-02T15:04:05.999+08:00"
 )
 
-// TimeNow .
+// TimeNow output time as Format(ISO8601)
 func TimeNow() string {
 	return time.Now().Format(ISO8601)
 }
@@ -137,14 +138,17 @@ func CheckErr(w http.ResponseWriter, err error, code int) bool {
 	return false
 }
 
+// JsonMsgOK ...
 func JsonMsgOK(w http.ResponseWriter) {
 	JsonMessage(w, "OK", 200)
 }
 
+// JsonMsg404 ...
 func JsonMsg404(w http.ResponseWriter) {
 	JsonMessage(w, "Not Found", 404)
 }
 
+// JsonRequireLogin ...
 func JsonRequireLogin(w http.ResponseWriter) {
 	JsonMessage(w, "Require Login", http.StatusUnauthorized)
 }
@@ -242,4 +246,23 @@ func BytesToThumb(img []byte, thumbPath string) error {
 // TypeByFilename 从文件名中截取后缀名，然后判断文件类型。
 func TypeByFilename(filename string) string {
 	return mime.TypeByExtension(filepath.Ext(filename))
+}
+
+// WrapErrors 把多个错误合并为一个错误.
+func WrapErrors(allErrors ...error) (wrapped error) {
+	for _, err := range allErrors {
+		if err != nil {
+			if wrapped == nil {
+				wrapped = err
+			} else {
+				wrapped = fmt.Errorf("%v | %v", err, wrapped)
+			}
+		}
+	}
+	return
+}
+
+// ErrorContains returns strings.Contains(err.Error(), substr)
+func ErrorContains(err error, substr string) bool {
+	return strings.Contains(err.Error(), substr)
 }
