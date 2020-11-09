@@ -46,9 +46,7 @@ func TimestampFilename(ext string) string {
 func NewID() string {
 	var max int64 = 100_000_000
 	n, err := rand.Int(rand.Reader, big.NewInt(max))
-	if err != nil {
-		panic(err)
-	}
+	CheckErrorPanic(err)
 	timestamp := time.Now().Unix()
 	idInt64 := timestamp*max + n.Int64()
 	return strconv.FormatInt(idInt64, 36)
@@ -60,9 +58,7 @@ func PathIsNotExist(name string) bool {
 	if os.IsNotExist(err) {
 		return true
 	}
-	if err != nil {
-		panic(err)
-	}
+	CheckErrorPanic(err)
 	return false
 }
 
@@ -75,18 +71,14 @@ func PathIsExist(name string) bool {
 // 如果没有则自动创建，如果已存在则不进行任何操作。
 func MustMkdir(dirName string) {
 	if PathIsNotExist(dirName) {
-		if err := os.Mkdir(dirName, 0700); err != nil {
-			panic(err)
-		}
+		CheckErrorPanic(os.Mkdir(dirName, 0700))
 	}
 }
 
 // UserHomeDir .
 func UserHomeDir() string {
 	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
+	CheckErrorPanic(err)
 	return homeDir
 }
 
@@ -265,4 +257,18 @@ func WrapErrors(allErrors ...error) (wrapped error) {
 // ErrorContains returns strings.Contains(err.Error(), substr)
 func ErrorContains(err error, substr string) bool {
 	return strings.Contains(err.Error(), substr)
+}
+
+// CheckErrorFatal .
+func CheckErrorFatal(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// CheckErrorPanic .
+func CheckErrorPanic(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
