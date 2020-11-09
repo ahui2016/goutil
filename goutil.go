@@ -1,4 +1,4 @@
-package goutil
+package goutil // import "github.com/ahui2016/goutil"
 
 import (
 	"crypto/rand"

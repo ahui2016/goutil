@@ -1,4 +1,4 @@
-package graphics
+package graphics // import "github.com/ahui2016/goutil/graphics"
 
 import (
 	"bytes"

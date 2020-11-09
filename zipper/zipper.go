@@ -1,4 +1,4 @@
-package zipper
+package zipper // import "github.com/ahui2016/goutil/zipper"
 
 import (
 	"archive/zip"
