@@ -281,34 +281,29 @@ func CheckErrorPanic(err error) {
 	}
 }
 
-// RequestPostForm returns a new Request with cookies,
-// and sets content-type to "application/x-www-form-urlencoded".
-// usage: http.DefaultClient.Do(req)
-func RequestPostForm(reqURL string, data url.Values, cookies []*http.Cookie) (
-	req *http.Request, err error) {
-
+// HttpPostForm issues a POST to the specified URL with cookies,
+// The Content-Type is set to "application/x-www-form-urlencoded".
+func HttpPostForm(url string, data url.Values, cookies []*http.Cookie) (*http.Response, error) {
 	body := strings.NewReader(data.Encode())
-	req, err = http.NewRequest(http.MethodPost, reqURL, body)
+	req, err := http.NewRequest(http.MethodPost, url, body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	for _, cookie := range cookies {
 		req.AddCookie(cookie)
 	}
-	return
+	return http.DefaultClient.Do(req)
 }
 
-// RequestGet returns a new Request with cookies.
-// usage: http.DefaultClient.Do(req)
-func RequestGet(reqURL string, cookies []*http.Cookie) (
-	req *http.Request, err error) {
-	req, err = http.NewRequest(http.MethodGet, reqURL, nil)
+// HttpGet issues a GET to the specified URL with cookies.
+func HttpGet(url string, cookies []*http.Cookie) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return
+		return nil, err
 	}
 	for _, cookie := range cookies {
 		req.AddCookie(cookie)
 	}
-	return
+	return http.DefaultClient.Do(req)
 }
