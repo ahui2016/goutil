@@ -14,6 +14,7 @@ import (
 	"math/big"
 	"mime"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -278,4 +279,36 @@ func CheckErrorPanic(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// RequestPostForm returns a new Request with cookies,
+// and sets content-type to "application/x-www-form-urlencoded".
+// usage: http.DefaultClient.Do(req)
+func RequestPostForm(reqURL string, data url.Values, cookies []*http.Cookie) (
+	req *http.Request, err error) {
+
+	body := strings.NewReader(data.Encode())
+	req, err = http.NewRequest(http.MethodPost, reqURL, body)
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
+	return
+}
+
+// RequestGet returns a new Request with cookies.
+// usage: http.DefaultClient.Do(req)
+func RequestGet(reqURL string, cookies []*http.Cookie) (
+	req *http.Request, err error) {
+	req, err = http.NewRequest(http.MethodGet, reqURL, nil)
+	if err != nil {
+		return
+	}
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
+	return
 }
