@@ -254,19 +254,26 @@ func WrapErrors(allErrors ...error) (wrapped error) {
 	return
 }
 
-// ErrorContains returns strings.Contains(err.Error(), substr)
+// ErrorContains returns NoCaseContains(err.Error(), substr)
 func ErrorContains(err error, substr string) bool {
-	return strings.Contains(err.Error(), substr)
+	return NoCaseContains(err.Error(), substr)
 }
 
-// CheckErrorFatal .
+// NoCaseContains reports whether substr is within s case-insensitive.
+func NoCaseContains(s, substr string) bool {
+	s = strings.ToLower(s)
+	substr = strings.ToLower(substr)
+	return strings.Contains(s, substr)
+}
+
+// CheckErrorFatal log.Fatal if err != nil
 func CheckErrorFatal(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-// CheckErrorPanic .
+// CheckErrorPanic panics if err != nil
 func CheckErrorPanic(err error) {
 	if err != nil {
 		panic(err)
