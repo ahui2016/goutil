@@ -307,3 +307,23 @@ func HttpGet(url string, cookies []*http.Cookie) (*http.Response, error) {
 	}
 	return http.DefaultClient.Do(req)
 }
+
+// HasString reports whether item is in the slice.
+func HasString(slice []string, item string) bool {
+	i := StringIndex(slice, item)
+	if i < 0 {
+		return false
+	}
+	return true
+}
+
+// StringIndex returns the index of item in the slice.
+// returns -1 if not found.
+func StringIndex(slice []string, item string) int {
+	for i, v := range slice {
+		if v == item {
+			return i
+		}
+	}
+	return -1
+}
