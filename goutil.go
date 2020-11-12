@@ -256,7 +256,11 @@ func WrapErrors(allErrors ...error) (wrapped error) {
 }
 
 // ErrorContains returns NoCaseContains(err.Error(), substr)
+// Returns false if err is nil.
 func ErrorContains(err error, substr string) bool {
+	if err == nil {
+		return false
+	}
 	return NoCaseContains(err.Error(), substr)
 }
 
