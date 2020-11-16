@@ -17,8 +17,8 @@ const (
 )
 
 // ResizeLimit resizes the image if it's long side bigger than limit.
-// Use default limit(900) if limit is set to zero.
-// Use default quality(85) if quality is set to zero.
+// Use default limit 900 if limit is set to zero.
+// Use default quality 85 if quality is set to zero.
 func ResizeLimit(img []byte, limit float64, quality int) (*bytes.Buffer, error) {
 	src, err := ReadImage(img)
 	if err != nil {
