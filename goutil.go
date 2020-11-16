@@ -142,7 +142,9 @@ func JsonResponse(w http.ResponseWriter, obj interface{}, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(obj)
+	if err := json.NewEncoder(w).Encode(obj); err != nil {
+		log.Print(err)
+	}
 }
 
 // GetFileContents gets contents from http.Request.FormFile("file").
@@ -318,7 +320,7 @@ func StringIndex(slice []string, item string) int {
 
 // TimeNow output time with format.
 func TimeNow(format string) string {
-	return time.Now().Format(ISO8601)
+	return time.Now().Format(format)
 }
 
 // TimestampFilename .
