@@ -315,3 +315,14 @@ func StringIndex(slice []string, item string) int {
 	}
 	return -1
 }
+
+// TimeNow output time with format.
+func TimeNow(format string) string {
+	return time.Now().Format(ISO8601)
+}
+
+// TimestampFilename .
+func TimestampFilename(ext string) string {
+	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	return name + ext
+}
